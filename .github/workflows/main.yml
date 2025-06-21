@@ -30,7 +30,7 @@ jobs:
           WEBDISK_PASSWORD: ${{ secrets.WEBDISK_PASSWORD }}
         run: |
           BUILD_DIR="dist/devops"
-          WEBDISK_URL="https://devcamp.online/public_html"
+            WEBDISK_URL="https://seu-dominio.com:2078/public_html"
 
           for file in $(find "$BUILD_DIR" -type f); do
             REMOTE_PATH="${WEBDISK_URL}/${file#"$BUILD_DIR/"}"
