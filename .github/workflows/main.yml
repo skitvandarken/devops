@@ -1,12 +1,14 @@
 name: Deploy Angular App to Web Disk
+
 on:
   push:
     branches:
-      - main  # Dispara ao fazer push na branch 
+      - main  # Dispara ao fazer push na branch main
       
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3  
@@ -21,13 +23,17 @@ jobs:
         
       - name: Build Angular App
         run: npm run build -- --configuration production      
+        
       - name: Deploy via WebDAV
         env:
           WEBDISK_USERNAME: ${{ secrets.WEBDISK_USERNAME }}
           WEBDISK_PASSWORD: ${{ secrets.WEBDISK_PASSWORD }}
         run: |
           BUILD_DIR="dist/devops"
-          WEBDISK_URL="https://devcamp.online/public_html"          for file in $(find $BUILD_DIR -type f); do
+          WEBDISK_URL="https://devcamp.online/public_html"
+
+          for file in $(find "$BUILD_DIR" -type f); do
             REMOTE_PATH="${WEBDISK_URL}/${file#"$BUILD_DIR/"}"
-            curl -u $WEBDISK_USERNAME:$WEBDISK_PASSWORD -T "$file" "$REMOTE_PATH"
+            echo "Uploading $file to $REMOTE_PATH"
+            curl -s -S -u "$WEBDISK_USERNAME:$WEBDISK_PASSWORD" -T "$file" "$REMOTE_PATH"
           done
