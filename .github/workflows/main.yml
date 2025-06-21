@@ -3,7 +3,7 @@ name: Deploy Angular App to Web Disk
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to main
 
 jobs:
   build-and-deploy:
@@ -24,26 +24,6 @@ jobs:
       - name: Build Angular App
         run: npm run build -- --configuration production
 
-      - name: Clean WebDisk Target Directory
-        env:
-          WEBDISK_USERNAME: ${{ secrets.WEBDISK_USERNAME }}
-          WEBDISK_PASSWORD: ${{ secrets.WEBDISK_PASSWORD }}
-        run: |
-          WEBDISK_URL="https://devcamp.online:2078"
-          
-          echo "🧹 Attempting to clean up WebDisk directory: $WEBDISK_URL"
-
-          # List and delete files in the root (non-recursive)
-          FILES=$(curl -k -s -u "$WEBDISK_USERNAME:$WEBDISK_PASSWORD" "$WEBDISK_URL" | grep -oP '(?<=<d:href>).*?(?=</d:href>)')
-
-          for FILE in $FILES; do
-            CLEANED_FILE=$(echo "$FILE" | sed 's|^/||')
-            if [ "$CLEANED_FILE" != "" ] && [ "$CLEANED_FILE" != "/" ]; then
-              echo "🗑️ Deleting: $WEBDISK_URL/$CLEANED_FILE"
-              curl -k -s -S -u "$WEBDISK_USERNAME:$WEBDISK_PASSWORD" -X DELETE "$WEBDISK_URL/$CLEANED_FILE" || true
-            fi
-          done
-
       - name: Deploy via WebDAV
         env:
           WEBDISK_USERNAME: ${{ secrets.WEBDISK_USERNAME }}
@@ -58,7 +38,7 @@ jobs:
 
             echo "Uploading $file to $REMOTE_PATH"
 
-            # Create remote directory structure
+            # Create remote directories if needed
             DIR_PATH=$(dirname "$RELATIVE_PATH")
             if [ "$DIR_PATH" != "." ]; then
               IFS='/' read -ra DIR_PARTS <<< "$DIR_PATH"
