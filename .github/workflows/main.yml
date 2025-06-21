@@ -30,7 +30,7 @@ jobs:
           WEBDISK_PASSWORD: ${{ secrets.WEBDISK_PASSWORD }}
         run: |
           BUILD_DIR="dist/devops"
-          WEBDISK_URL="https://devcamp.online:2078/"
+          WEBDISK_URL="https://devcamp.online:2078"
 
           find "$BUILD_DIR" -type f | while read -r file; do
             RELATIVE_PATH="${file#"$BUILD_DIR/"}"
